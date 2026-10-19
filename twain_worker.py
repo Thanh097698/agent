@@ -9,6 +9,7 @@ from datetime import datetime
 from pathlib import Path
 
 from agent_common import MAX_IMAGE, MAX_IMAGES, MAX_JOB_BYTES, MAX_PIXELS, atomic_json, read_json
+from fingerprint import FingerprintError
 
 
 class FrameWriter:
@@ -158,8 +159,15 @@ def run(directory: str) -> int:
         time.sleep(0.02)
     try:
         request = read_json(directory_path / "request.json")
-        result = choose_folder(request["params"]) if request["kind"] == "folder" else (mock_job if request["mock"] else twain_job)(
-                request["kind"], directory_path, request["params"])
+        if request["kind"] == "fingerprint":
+            from fingerprint import capture_job
+            result = capture_job(directory_path, request["params"], request["mock"])
+        elif request["kind"] == "folder":
+            result = choose_folder(request["params"])
+        else:
+            result = (mock_job if request["mock"] else twain_job)(request["kind"], directory_path, request["params"])
+    except FingerprintError as error:
+        result = error.result()
     except Exception as error:
         # No raw driver messages, patient data, paths or tokens are sent to logs/web.
         code = str(error) if str(error) in {"IMAGE_LIMIT", "INVALID_FOLDER"} else "DRIVER_ERROR"

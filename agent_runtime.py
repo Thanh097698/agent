@@ -9,7 +9,11 @@ from pathlib import Path
 
 from agent_common import (AgentError, CAPTURE_SECONDS, JOB_TTL_SECONDS, MAX_IMAGE, MAX_IMAGES, MAX_JOB_BYTES,
                           Pairings, atomic_json, identifier, read_json, safe_remove_job, text)
+from fingerprint import FINGER_SECONDS, ReaderPresence
 from worker_process import WorkerProcess
+
+# Tác vụ trả ảnh về web qua /jobs/<id>/images/<n>.
+IMAGE_KINDS = {"capture", "fingerprint"}
 
 
 @dataclass
@@ -37,7 +41,7 @@ class Job:
 
 class AgentRuntime:
     def __init__(self, data_dir: Path, mock: bool = False, capture_seconds: float = CAPTURE_SECONDS,
-                 worker_factory=WorkerProcess):
+                 worker_factory=WorkerProcess, reader: ReaderPresence | None = None):
         self.data_dir = data_dir.resolve()
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.root = self.data_dir / "jobs"
@@ -46,6 +50,7 @@ class AgentRuntime:
         self.mock = mock
         self.capture_seconds = capture_seconds
         self.worker_factory = worker_factory
+        self.reader = reader or ReaderPresence(mock)
         self.lock = threading.RLock()
         self.jobs: dict[str, Job] = {}
         self.active: str | None = None
@@ -70,7 +75,7 @@ class AgentRuntime:
 
     def start_job(self, owner: str, grant: dict, body: dict) -> dict:
         kind = body.get("kind")
-        if kind not in {"sources", "capture", "folder"}:
+        if kind not in {"sources", "capture", "folder", "fingerprint"}:
             raise AgentError(400, "INVALID_JOB", "Loại tác vụ không hợp lệ")
         request_id = identifier(body.get("requestId"))
         clinic_key = grant["clinicKey"]
@@ -86,10 +91,12 @@ class AgentRuntime:
             self._prune()
             if self.active is not None:
                 raise AgentError(409, "BUSY", "Máy đang xử lý một tác vụ khác. Hãy đợi hoặc hủy tác vụ đó.")
-            if len(self.jobs) >= 256 or sum(not job.released and job.kind == "capture" for job in self.jobs.values()) >= 8 \
+            if len(self.jobs) >= 256 or sum(not job.released and job.kind in IMAGE_KINDS for job in self.jobs.values()) >= 8 \
                     or self._disk_usage() > 128 * 1024 * 1024 - MAX_JOB_BYTES:
                 raise AgentError(507, "TEMP_STORAGE_FULL", "Ảnh tạm chưa được nhận hết. Hoàn tất lượt trước rồi thử lại.")
             params = {"label": grant.get("label", clinic_key)} if kind == "folder" else {}
+            if kind == "fingerprint":
+                params = {"seconds": FINGER_SECONDS}
             if kind == "capture":
                 device_id = identifier(body.get("deviceId"))
                 machine = self.pairings.settings(clinic_key)
@@ -110,7 +117,7 @@ class AgentRuntime:
             job_id = secrets.token_hex(16)
             directory = self.root / job_id
             directory.mkdir()
-            seconds = self.capture_seconds if kind == "capture" else (120 if kind == "folder" else 20)
+            seconds = {"capture": self.capture_seconds, "folder": 120, "fingerprint": FINGER_SECONDS + 15}.get(kind, 20)
             seconds = min(seconds, max(0, grant.get("expiresAt", time.time() + seconds) - time.time()))
             job = Job(job_id, request_id, owner, clinic_key, kind, directory, time.monotonic() + seconds)
             self.jobs[job_id] = job
@@ -271,7 +278,7 @@ class AgentRuntime:
                     if not Path(folder).is_absolute() or folder.startswith(("\\\\", "//")):
                         raise ValueError("Invalid local folder")
                     self.pairings.save_folder(job.clinic_key, folder)
-                if job.kind == "capture" and result.get("ok"):
+                if job.kind in IMAGE_KINDS and result.get("ok"):
                     self._validate_images(job, result)
                 if result.get("ok"):
                     result.pop("ok", None)

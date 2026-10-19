@@ -1,6 +1,6 @@
 # Cài ViDental Imaging Agent từ Git bằng CMD
 
-Agent 2.0.0 / giao thức v2. Cài trên chính máy tính Windows của phòng khám sẽ cắm sensor và mở web ViDental. Không cần bộ cài Agent `.exe`.
+Agent 2.1.0 / giao thức v2. Cài trên chính máy tính Windows của phòng khám sẽ cắm sensor và mở web ViDental. Không cần bộ cài Agent `.exe`.
 
 Chưa biết hãng/model vẫn có thể cài Git, tải mã và thử giả lập. Để dùng sensor thật, cần driver TWAIN đúng model và Python cùng loại 32-bit hoặc 64-bit với driver. Không suy loại driver từ Windows 64-bit.
 
@@ -66,7 +66,7 @@ Lệnh đầu tạo môi trường Python riêng; lệnh sau cần Internet. Ch�
 .venv-clinic\Scripts\python.exe agent.py --mock
 ```
 
-Cửa sổ Agent xuất hiện, có nút **Tạo mã kết nối** và trạng thái giả lập. Giữ CMD mở. Mở trình duyệt tại `http://127.0.0.1:27100/health`; phản hồi có `version` là `2.0.0` xác nhận Agent đang chạy.
+Cửa sổ Agent xuất hiện, có nút **Tạo mã kết nối** và trạng thái giả lập. Giữ CMD mở. Mở trình duyệt tại `http://127.0.0.1:27100/health`; phản hồi có `version` là `2.1.0` xác nhận Agent đang chạy.
 
 Chế độ này dùng ảnh giả, chưa kiểm tra driver/sensor. Thoát Agent hoặc nhấn Ctrl+C trong CMD trước khi chạy chế độ thật. Chỉ chạy một Agent trên máy.
 
@@ -102,7 +102,19 @@ Giữ CMD và Agent mở. Mặc định Agent cho phép web `https://app.videnta
 
 Web phải hỗ trợ giao thức v2. Việc `/health` trả kết quả chỉ chứng minh Agent đang chạy, chưa chứng minh sensor và lưu hồ sơ đã hoạt động.
 
-## 8. Mở lại mỗi ngày và cập nhật
+## 8. Máy điểm chỉ ZKTeco ZK9500 (nếu phòng khám dùng)
+
+Cần Agent **2.1.0** trở lên. Máy đã cài bản cũ thì làm bước 9 (cập nhật) trước.
+
+1. Tải driver **ZKFinger** (ZKFinger SDK cho ZK9500) từ zkteco.com hoặc nhà cung cấp máy, chạy bộ cài. Chọn cùng loại 32-bit hoặc 64-bit với Python đã kiểm ở bước 2.
+2. Cắm máy điểm chỉ vào cổng USB, chờ Windows nhận thiết bị.
+3. Chạy Agent như bước 6. Cửa sổ Agent hiện **Đã cắm máy điểm chỉ** là Agent đã thấy máy. Mở `http://127.0.0.1:27100/health` sẽ thấy `"fingerprint": true`.
+4. Nếu máy này chưa ghép với web: làm bước 7 mục 3–4 (**Thiết lập máy này** → nhập mã kết nối). Không cần thêm thiết bị hay chọn nguồn TWAIN cho máy điểm chỉ.
+5. Mở phiếu có ô ký **Người bệnh / Đại diện** (ví dụ Phiếu đồng ý điều trị) → bấm **Điểm chỉ** ở góc trái ô ký → đặt ngón tay lên máy → kiểm tra ảnh, tick **Người nhà ký thay** nếu người nhà ký → **Áp dụng** → **Lưu** phiếu.
+
+Nút **Điểm chỉ** chỉ hiện trên máy đang chạy Agent và đang cắm máy điểm chỉ; rút máy hoặc tắt Agent thì nút tự ẩn sau vài giây. Tài khoản khác trên cùng trình duyệt chưa ghép nối sẽ được hỏi mã kết nối ngay trong hộp thoại Điểm chỉ.
+
+## 9. Mở lại mỗi ngày và cập nhật
 
 Mỗi ngày chỉ mở CMD và chạy:
 
@@ -134,5 +146,7 @@ Nếu bất kỳ lệnh nào báo lỗi, dừng và gửi thông báo cho quản
 | Cổng 27100 đang dùng | Kiểm tra Agent đã mở; chỉ chạy một bản trên máy. |
 | Không thấy nguồn TWAIN | Kiểm tra driver, thiết bị đã nhận và Python cùng 32/64-bit. |
 | Không có nút Chụp từ máy | Thiết bị phải đang bật; tài khoản cần quyền Sửa tab Hình ảnh. |
+| Không có nút Điểm chỉ | Agent 2.1.0+ phải đang chạy, cửa sổ Agent báo **Đã cắm máy điểm chỉ**, và trình duyệt đã ghép nối (bước 7). |
+| Điểm chỉ báo chưa cài driver | Cài driver ZKFinger cùng 32/64-bit với Python của Agent, rút máy ra cắm lại. |
 
 Chưa xác nhận tương thích với model sensor cụ thể. Hãng/model và driver sẽ bổ sung khi có thiết bị. Camera USB nhận như webcam dùng nhánh Camera USB của web, không cần Agent.

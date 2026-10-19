@@ -8,7 +8,7 @@ import secrets
 import time
 from pathlib import Path
 
-VERSION = "2.0.0"
+VERSION = "2.1.0"
 PROTOCOL = 2
 PORT = 27100
 MAX_JSON = 64 * 1024

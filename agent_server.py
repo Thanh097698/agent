@@ -155,7 +155,8 @@ class Handler(BaseHTTPRequestHandler):
             return
         if self.command == "GET" and path == "/health":
             self._json(200, {"ok": True, "version": VERSION, "protocol": PROTOCOL, "mock": runtime.mock,
-                             "busy": runtime.busy(), "architecture": struct.calcsize("P") * 8})
+                             "busy": runtime.busy(), "architecture": struct.calcsize("P") * 8,
+                             "fingerprint": runtime.reader.present()})
             return
         # Parse bounded JSON before acquiring any job/device state.
         body = self._body() if self.command == "POST" else {}

@@ -5,7 +5,7 @@ Camera USB/webcam vẫn chạy trực tiếp trong trình duyệt, không cần 
 
 ## Cài từ Git trên máy phòng khám (CMD)
 
-Kho public: https://github.com/Thanh097698/agent — Agent **2.0.0**, giao thức **v2**.
+Kho public: https://github.com/Thanh097698/agent — Agent **2.1.0**, giao thức **v2**.
 
 Đọc [hướng dẫn từng bước cho người không chuyên](INSTALL.md), gồm cách mở CMD,
 cài Git/Python, tải mã, cài thư viện, cài driver và ghép nối với web.
@@ -52,6 +52,29 @@ Không tắt bảo mật trình duyệt/SmartScreen để xử lý sự cố. B�
 Bản mới không gọi giao thức v1. Cần cập nhật **web và agent cùng đợt**. Không có fallback không xác thực.
 Các trường agentUrl/sourceName/localSaveDir cũ trong cấu hình BE không còn điều khiển agent; chọn lại nguồn/thư mục trên từng máy.
 Camera USB và API tải ảnh hiện có vẫn được giữ nguyên.
+
+## Máy điểm chỉ (ZKTeco ZK9500)
+
+Từ agent **2.1.0**. Dùng ở ô ký "Người bệnh / Đại diện" của phiếu bệnh án: chỉ máy tính đang cắm
+máy điểm chỉ (và đang chạy agent) mới hiện nút **Điểm chỉ**.
+
+1. Cài driver **ZKFinger** của ZKTeco (zkteco.com → ZKFinger SDK / driver ZK9500) cùng loại 32-bit
+   hoặc 64-bit với Python/bộ cài agent. Cắm máy, chờ Windows nhận thiết bị.
+2. Chạy agent 2.1.0 trở lên. Cửa sổ agent hiện "Đã cắm máy điểm chỉ" khi thấy máy.
+3. Ghép nối web với agent một lần trên máy này: Cấu hình → Tích hợp → Thiết bị hình ảnh →
+   **Thiết lập máy này** (bước 1–2). Máy điểm chỉ không cần khai báo thiết bị hay chọn nguồn TWAIN.
+   Tài khoản khác trên cùng trình duyệt nhập mã kết nối ngay trong hộp thoại Điểm chỉ.
+4. Phiếu → ô ký người bệnh → **Điểm chỉ** → đặt ngón tay → kiểm tra ảnh, tick "Người nhà ký thay"
+   nếu cần → **Áp dụng**.
+
+- Agent chỉ lấy ẢNH (`ZKFPM_AcquireFingerprintImage`), không trích hay lưu mẫu vân tay; ảnh tạm
+  bị xoá khi web nhận xong. Chờ đặt tay tối đa 30 giây.
+- Nhận máy qua danh sách USB đang cắm của Windows (VID `1B55` = ZKTeco), không nạp driver vào tiến
+  trình chính; lấy ảnh chạy trong tiến trình con như TWAIN.
+- Web chỉ hỏi agent trên trình duyệt đã từng ghép nối với phòng khám, nên máy không cài agent
+  không bị trình duyệt hỏi quyền mạng cục bộ.
+- Chưa thử với máy ZK9500 thật: phần gọi `libzkfp.dll` viết theo SDK, đã kiểm bằng thư viện giả lập
+  và `--mock` (vân tay giả).
 
 ## Giới hạn và cách hủy
 

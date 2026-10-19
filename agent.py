@@ -145,7 +145,8 @@ def desktop(runtime, quiet: bool) -> None:
                 return
             show()
         status.set(f"v{VERSION} · {'GIẢ LẬP — không phải ảnh bệnh nhân' if runtime.mock else 'Sẵn sàng'}"
-                   f" · {'Đang xử lý thiết bị' if runtime.busy() else 'Chưa có tác vụ'}")
+                   f" · {'Đang xử lý thiết bị' if runtime.busy() else 'Chưa có tác vụ'}"
+                   f"{' · Đã cắm máy điểm chỉ' if runtime.reader.present() else ''}")
         if runtime.pairings.code is None or time.monotonic() >= runtime.pairings.code_until:
             if code.get().isdigit():
                 code.set("Tạo mã mới để kết nối")
