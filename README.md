@@ -25,7 +25,7 @@ python -m venv .venv-clinic
 .venv-clinic\Scripts\python.exe agent.py
 ```
 
-Giữ CMD và Agent chạy. Web mặc định được cho phép: `https://app.vidental.vn`.
+Giữ CMD và Agent chạy. Web mặc định được cho phép: `https://app.vidental.vn` và `https://app.vipeo.vn`.
 Nếu dùng origin khác, xem `--allowed-origins` trong [INSTALL.md](INSTALL.md).
 Chưa có sensor có thể chạy với `--mock` để kiểm tra cài đặt; đây là ảnh giả lập.
 
@@ -98,7 +98,7 @@ Nguồn TWAIN bị treo do driver có thể cần rút/cắm lại thiết bị 
 ## Bảo mật
 
 - Chỉ lắng nghe 127.0.0.1:27100, không mở LAN, không thêm firewall rule.
-- Origin mặc định duy nhất https://app.vidental.vn; kiểm tra Host và Origin, không cho wildcard/Origin null.
+- Origin mặc định: https://app.vidental.vn và https://app.vipeo.vn; kiểm tra Host và Origin, không cho wildcard/Origin null.
 - Chỉ health cho phép thiếu Origin để chẩn đoán cục bộ. Mọi thao tác còn lại cần Origin hợp lệ; trừ ghép nối, cần Bearer token riêng của agent.
 - Mã ghép nối: 8 số, 2 phút, dùng một lần, tối đa 5 lần sai. Chỉ tạo mã bằng cửa sổ agent.
 - Token kết nối 30 ngày, chỉ lưu hash trong cấu hình agent; session tối đa 1 giờ và không vượt hạn kết nối, giữ trong RAM. Không truyền token trên URL.

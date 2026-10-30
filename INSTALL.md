@@ -83,7 +83,7 @@ cd /d "%USERPROFILE%\ViDental\clinic-imaging-agent"
 .venv-clinic\Scripts\python.exe agent.py
 ```
 
-Giữ CMD và Agent mở. Mặc định Agent cho phép web `https://app.vidental.vn`. Nếu web có địa chỉ khác, thoát Agent trước rồi dùng đúng origin. Ví dụ web dev đang mở `http://localhost:5173`:
+Giữ CMD và Agent mở. Mặc định Agent cho phép web `https://app.vidental.vn` và `https://app.vipeo.vn`. Nếu web có địa chỉ khác, thoát Agent trước rồi dùng đúng origin. Ví dụ web dev đang mở `http://localhost:5173`:
 
 ```bat
 .venv-clinic\Scripts\python.exe agent.py --allowed-origins http://localhost:5173

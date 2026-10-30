@@ -8,7 +8,7 @@ import secrets
 import time
 from pathlib import Path
 
-VERSION = "2.1.0"
+VERSION = "2.1.1"
 PROTOCOL = 2
 PORT = 27100
 MAX_JSON = 64 * 1024
@@ -19,6 +19,8 @@ MAX_IMAGES = 50
 CAPTURE_SECONDS = 600
 JOB_TTL_SECONDS = 900
 DEFAULT_ORIGIN = "https://app.vidental.vn"
+# Web nha khoa (app.vidental.vn) + da liễu / tai mũi họng (app.vipeo.vn, 30/10/2026) — cùng một phần mềm.
+DEFAULT_ORIGINS = DEFAULT_ORIGIN + ",https://app.vipeo.vn"
 
 
 class AgentError(Exception):

@@ -12,7 +12,7 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from agent_common import DEFAULT_ORIGIN, PORT, VERSION
+from agent_common import DEFAULT_ORIGINS, PORT, VERSION
 
 
 def main() -> int:
@@ -23,7 +23,7 @@ def main() -> int:
     parser.add_argument("--headless", action="store_true", help="For automated tests / supervised development only")
     parser.add_argument("--data-dir", type=Path)
     parser.add_argument("--port", type=int, default=PORT)
-    parser.add_argument("--allowed-origins", default=DEFAULT_ORIGIN)
+    parser.add_argument("--allowed-origins", default=DEFAULT_ORIGINS)
     args = parser.parse_args()
     if args.worker:
         from twain_worker import run
